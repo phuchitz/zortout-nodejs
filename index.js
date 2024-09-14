@@ -3,8 +3,6 @@ const connectDB = require("./config/db");
 const fetchOrderData = require("./services/orderService");
 require("dotenv").config();
 
-require("./cronJobs");
-
 const app = express();
 const port = process.env.PORT || 3030;
 
