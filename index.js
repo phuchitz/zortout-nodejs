@@ -1,5 +1,6 @@
 const express = require("express");
 const connectDB = require("./config/db");
+const fetchOrderData = require("./services/orderService");
 require("dotenv").config();
 
 require("./cronJobs");
@@ -19,7 +20,7 @@ app.get("/fetch-orders", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Server is running!");
+  res.send("Server is running !!!");
 });
 
 app.listen(port, () => {
