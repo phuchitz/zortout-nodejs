@@ -1,0 +1,13 @@
+name: Run Fetch Orders
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Run every 10 minutes
+
+jobs:
+  fetch-orders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Orders Data
+        run: |
+          curl -X GET https://zortout-nodejs.vercel.app/fetch-orders
