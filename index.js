@@ -1,22 +1,15 @@
 const express = require("express");
-const cron = require("node-cron");
 const connectDB = require("./config/db");
-const fetchOrderData = require("./services/orderService");
 require("dotenv").config();
+
+require("./cronJobs");
 
 const app = express();
 const port = process.env.PORT || 3030;
 
 connectDB();
 
-cron.schedule("*/10 * * * *", () => {
-  console.log("Running the cron job every minute...");
-  fetchOrderData()
-    .then(() => console.log("Data fetched and processed."))
-    .catch((error) => console.log("Error during data fetching:", error));
-});
-
-app.get("/check", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Server is running!");
 });
 
