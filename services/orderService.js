@@ -95,23 +95,28 @@ async function fetchOrderData() {
                       },
                     }
                   );
+                  console.log(`Zortout API response: `, zortoutResponse.data);
                 } catch (error) {
-                  console.error("Error zortout fetching :", error);
+                  console.error("Error zortout API:", error.response ? error.response.data : error.message);
                 }
+              } else {
+                console.error(`Error: Failed to fetch order details. Response status: ${detailResponse.data.status}`);
               }
             }
           } catch (error) {
             logger.error("Error fetching order detail:", error);
-            console.error("Error processing order:", error);
+            console.error("Error processing order detail:", error.response ? error.response.data : error.message);
           }
         }
       }
+    } else {
+      console.error(`Error: Failed to fetch order list. Response status: ${response.data.status}`);
     }
   } catch (error) {
     logger.error("Error fetching order data:", error);
     console.error(
       "Error fetching order data:",
-      error.response?.data || error.message
+      error.response ? error.response.data : error.message
     );
   }
 }
