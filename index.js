@@ -9,7 +9,7 @@ const port = process.env.PORT || 3030;
 
 connectDB();
 
-cron.schedule("*/1 * * * *", () => {
+cron.schedule("*/10 * * * *", () => {
   console.log("Running the cron job every minute...");
   fetchOrderData()
     .then(() => console.log("Data fetched and processed."))
