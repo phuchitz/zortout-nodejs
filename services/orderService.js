@@ -69,12 +69,29 @@ async function fetchOrderData() {
                     paymentdate:
                       detailResponse.data.data.order.payment_datetime,
                     list: detailResponse.data.data.order.order_item.map(
-                      (item, index) => {
+                      async (item, index) => {
+                        const getProductsUrl =
+                          "https://open-api.zortout.com/v4/Product/GetProducts?searchsku=";
+                        const getProductsPayload = item.sku;
+
+                        const responseSkuItem = await axios.get(
+                          getProductsUrl,
+                          getProductsPayload,
+                          {
+                            headers: {
+                              Accept: "application/json",
+                              "Content-Type": "application/json",
+                              storename: process.env.STORENAME,
+                              apikey: process.env.API_KEY,
+                              apisecret: process.env.API_SECRET,
+                            },
+                          }
+                        );
                         return {
                           sku: item.sku,
-                          name: item.name,
+                          name: responseSkuItem.data.list[0].name,
                           number: parseFloat(item.qty.toString()),
-                          pricepernumber: parseFloat(item.price.toString()),
+                          pricepernumber: parseFloat(responseSkuItem.data.list[0].sellprice),
                           discount: "0",
                           totalprice: parseFloat(item.total.toString()),
                         };
@@ -97,20 +114,30 @@ async function fetchOrderData() {
                   );
                   console.log(`Zortout API response: `, zortoutResponse.data);
                 } catch (error) {
-                  console.error("Error zortout API:", error.response ? error.response.data : error.message);
+                  console.error(
+                    "Error zortout API:",
+                    error.response ? error.response.data : error.message
+                  );
                 }
               } else {
-                console.error(`Error: Failed to fetch order details. Response status: ${detailResponse.data.status}`);
+                console.error(
+                  `Error: Failed to fetch order details. Response status: ${detailResponse.data.status}`
+                );
               }
             }
           } catch (error) {
             logger.error("Error fetching order detail:", error);
-            console.error("Error processing order detail:", error.response ? error.response.data : error.message);
+            console.error(
+              "Error processing order detail:",
+              error.response ? error.response.data : error.message
+            );
           }
         }
       }
     } else {
-      console.error(`Error: Failed to fetch order list. Response status: ${response.data.status}`);
+      console.error(
+        `Error: Failed to fetch order list. Response status: ${response.data.status}`
+      );
     }
   } catch (error) {
     logger.error("Error fetching order data:", error);
