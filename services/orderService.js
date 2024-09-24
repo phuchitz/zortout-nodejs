@@ -46,8 +46,6 @@ async function fetchOrderData() {
                 },
               });
 
-              console.log("before if");
-
               if (detailResponse.data.status === 1) {
                 const zortout_Url = `https://open-api.zortout.com/v4/Order/AddOrder`;
 
@@ -98,7 +96,7 @@ async function fetchOrderData() {
                     list: responseSkuItem.data.data.list.map((item, index) => {
                       const findQty =
                         detailResponse.data.data.order.order_item.find(
-                          (qtyItem) => qtyItem.qty === item.sellprice
+                          (qtyItem) => qtyItem.sku === item.sku
                         ).qty;
                       return {
                         sku: item.sku,
