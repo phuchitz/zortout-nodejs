@@ -46,6 +46,8 @@ async function fetchOrderData() {
                 },
               });
 
+              console.log("before if");
+
               if (detailResponse.data.status === 1) {
                 const zortout_Url = `https://open-api.zortout.com/v4/Order/AddOrder`;
 

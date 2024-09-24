@@ -17,7 +17,7 @@ async function getAccessToken() {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
-    console.log("response: " + response)
+    console.log("login: " + response)
     return response.data.access_token;
   } catch (error) {
     if (error.response && error.response.status === 401) {
