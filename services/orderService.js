@@ -93,7 +93,7 @@ async function fetchOrderData() {
                       detailResponse.data.data.order.payment_method,
                     paymentdate:
                       detailResponse.data.data.order.payment_datetime,
-                    list: responseSkuItem.map((item, index) => {
+                    list: responseSkuItem.data.data.list.map((item, index) => {
                       const findQty =
                         detailResponse.data.data.order.order_item.find(
                           (qtyItem) => qtyItem.qty === item.sellprice
