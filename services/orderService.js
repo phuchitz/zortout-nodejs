@@ -56,6 +56,9 @@ async function fetchOrderData() {
                   (item, index) => item.sku
                 );
 
+                logger.info("skuLists : ", skuLists);
+                console.log("skuLists : ", skuLists);
+
                 const responseSkuItem = await axios.get(getProductsUrl, {
                   headers: {
                     Accept: "application/json",
@@ -66,6 +69,9 @@ async function fetchOrderData() {
                     skulist: skuLists.join(","),
                   },
                 });
+
+                logger.info("responseSkuItem : ", responseSkuItem);
+                console.log("responseSkuItem : ", responseSkuItem);
 
                 try {
                   const zortoutPayload = {
