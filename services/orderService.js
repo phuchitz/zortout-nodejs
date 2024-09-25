@@ -111,7 +111,20 @@ async function fetchOrderData() {
                       detailResponse.data.data.order.payment_method,
                     paymentdate:
                       detailResponse.data.data.order.payment_datetime,
-                    list: responseSkuItem.data.data.list.map((item, index) => {
+                    list: detailResponse.data.data.order.order_item.map(
+                      (item, index) => {
+                        return {
+                          sku: item.sku,
+                          name: item.name,
+                          number: parseFloat(item.qty.toString()),
+                          pricepernumber: parseFloat(item.price.toString()),
+                          discount: "0",
+                          totalprice: parseFloat(item.total.toString()),
+                        };
+                      }
+                    ),
+
+                    /* responseSkuItem.data.data.list.map((item, index) => {
                       const findQty =
                         detailResponse.data.data.order.order_item.find(
                           (qtyItem) => qtyItem.sku === item.sku
@@ -127,7 +140,7 @@ async function fetchOrderData() {
                           detailResponse.data.data.order.grand_total.toString()
                         ),
                       };
-                    }),
+                    }) */
 
                     /* detailResponse.data.data.order.order_item.map(
                       (item, index) => {
