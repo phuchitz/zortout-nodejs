@@ -22,6 +22,24 @@ async function fetchOrderData() {
         if (order.is_paid) {
           const orderDetailUrl = `https://order.bentoweb.com/api/order/order-full/${order.order_id}`;
 
+          /* FOR TEST LOG START */
+
+          const detailTest = await axios.get(orderDetailUrl, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "application/json",
+            },
+          });
+
+          const skuListsTest = detailTest.data.data.order.order_item.map(
+            (item, index) => item.sku
+          );
+
+          logger.info("sku lists : ", skuListsTest);
+          console.log("sku lists : ", skuListsTest);
+
+          /* FOR TEST LOG END */
+
           try {
             const existingOrder = await ProcessedOrder.findOne({
               orderId: order.order_id.toString(),
