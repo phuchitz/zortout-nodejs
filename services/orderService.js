@@ -70,7 +70,7 @@ async function fetchOrderData() {
                 const getProductsUrl =
                   "https://open-api.zortout.com/v4/Product/GetProducts";
 
-                const skuLists = detailResponse.data.data.order.order_item.map(
+                /* const skuLists = detailResponse.data.data.order.order_item.map(
                   (item, index) => item.sku
                 );
 
@@ -89,7 +89,7 @@ async function fetchOrderData() {
                 });
 
                 logger.info("responseSkuItem : ", responseSkuItem);
-                console.log("responseSkuItem : ", responseSkuItem);
+                console.log("responseSkuItem : ", responseSkuItem); */
 
                 try {
                   const zortoutPayload = {
