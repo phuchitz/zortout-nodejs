@@ -22,24 +22,6 @@ async function fetchOrderData() {
         if (order.is_paid) {
           const orderDetailUrl = `https://order.bentoweb.com/api/order/order-full/${order.order_id}`;
 
-          /* FOR TEST LOG START */
-
-          const detailTest = await axios.get(orderDetailUrl, {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              Accept: "application/json",
-            },
-          });
-
-          const skuListsTest = detailTest.data.data.order.order_item.map(
-            (item, index) => item.sku
-          );
-
-          logger.info("sku lists : ", skuListsTest);
-          console.log("sku lists : ", skuListsTest);
-
-          /* FOR TEST LOG END */
-
           try {
             const existingOrder = await ProcessedOrder.findOne({
               orderId: order.order_id.toString(),
@@ -70,13 +52,11 @@ async function fetchOrderData() {
                 const getProductsUrl =
                   "https://open-api.zortout.com/v4/Product/GetProducts";
 
-                /* const skuLists = detailResponse.data.data.order.order_item.map(
+                const skuLists = detailResponse.data.data.order.order_item.map(
                   (item, index) => item.sku
                 );
 
-                logger.info("skuLists : ", skuLists);
-                console.log("skuLists : ", skuLists);
-
+                /* GET SKU ZORTOUT LIST START */
                 const responseSkuItem = await axios.get(getProductsUrl, {
                   headers: {
                     Accept: "application/json",
@@ -87,9 +67,7 @@ async function fetchOrderData() {
                     skulist: skuLists.join(","),
                   },
                 });
-
-                logger.info("responseSkuItem : ", responseSkuItem);
-                console.log("responseSkuItem : ", responseSkuItem); */
+                /* GET SKU ZORTOUT LIST END */
 
                 try {
                   const zortoutPayload = {
@@ -111,51 +89,26 @@ async function fetchOrderData() {
                       detailResponse.data.data.order.payment_method,
                     paymentdate:
                       detailResponse.data.data.order.payment_datetime,
+                    /* MAPPING PRODUCT LIST START */
                     list: detailResponse.data.data.order.order_item.map(
                       (item, index) => {
+                        const productBySku = responseSkuItem.data.list.find(
+                          (findSku, index) => findSku.sku === item.sku
+                        );
                         return {
                           sku: item.sku,
-                          name: item.name,
+                          name: productBySku.name,
                           number: parseFloat(item.qty.toString()),
-                          pricepernumber: parseFloat(item.price.toString()),
+                          pricepernumber: parseFloat(productBySku.sellprice),
                           discount: "0",
                           totalprice: parseFloat(item.total.toString()),
                         };
                       }
                     ),
-
-                    /* responseSkuItem.data.data.list.map((item, index) => {
-                      const findQty =
-                        detailResponse.data.data.order.order_item.find(
-                          (qtyItem) => qtyItem.sku === item.sku
-                        ).qty;
-                      return {
-                        sku: item.sku,
-                        name: item.name,
-                        // number: parseFloat(item.qty.toString()),
-                        number: parseFloat(findQty.toString()),
-                        pricepernumber: parseFloat(item.sellprice.toString()),
-                        discount: "0",
-                        totalprice: parseFloat(
-                          detailResponse.data.data.order.grand_total.toString()
-                        ),
-                      };
-                    }) */
-
-                    /* detailResponse.data.data.order.order_item.map(
-                      (item, index) => {
-                        return {
-                          sku: item.sku,
-                          name: item.name,
-                          number: parseFloat(item.qty.toString()),
-                          pricepernumber: parseFloat(item.price.toString()),
-                          discount: "0",
-                          totalprice: parseFloat(item.total.toString()),
-                        };
-                      }
-                    ), */
+                    /* MAPPING PRODUCT LIST END */
                   };
-                  console.log(zortoutPayload);
+
+                  /* ADD ORDER TO ZORTOUT START */
                   const zortoutResponse = await axios.post(
                     zortout_Url,
                     zortoutPayload,
@@ -170,6 +123,7 @@ async function fetchOrderData() {
                     }
                   );
                   console.log(`Zortout API response: `, zortoutResponse.data);
+                  /* ADD ORDER TO ZORTOUT END */
                 } catch (error) {
                   console.error(
                     "Error zortout API:",
