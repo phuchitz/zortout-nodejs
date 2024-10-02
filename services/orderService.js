@@ -56,6 +56,15 @@ async function fetchOrderData() {
                   (item, index) => item.sku
                 );
 
+                const skuBundleLists =
+                  detailResponse.data.data.order.order_item.map(
+                    (item, index) => {
+                      if (item.sku.includes("-")) {
+                        return item.sku;
+                      }
+                    }
+                  );
+
                 /* GET SKU ZORTOUT LIST START */
                 const responseSkuItem = await axios.get(getProductsUrl, {
                   headers: {
@@ -91,15 +100,40 @@ async function fetchOrderData() {
                       detailResponse.data.data.order.payment_datetime,
                     /* MAPPING PRODUCT LIST START */
                     list: detailResponse.data.data.order.order_item.map(
-                      (item, index) => {
+                      async (item, index) => {
                         const productBySku = responseSkuItem.data.list.find(
                           (findSku, index) => findSku.sku === item.sku
                         );
+                        let skuBundleResponse = null;
+                        if (skuBundleLists) {
+                          const hasSkuBundle = skuBundleLists.find(
+                            (findBundle, index) => findBundle.sku === item.sku
+                          );
+                          /* GET SKU BUNDLE ZORTOUT LIST START */
+                          const responseSkuItem = await axios.get(
+                            `https://open-api.zortout.com/v4/Bundle/GetBundles?keyword=${hasSkuBundle}`,
+                            {
+                              headers: {
+                                Accept: "application/json",
+                                "Content-Type": "application/json",
+                                storename: process.env.STORENAME,
+                                apikey: process.env.API_KEY,
+                                apisecret: process.env.API_SECRET,
+                              },
+                            }
+                          );
+                          skuBundleResponse = responseSkuItem.data.list[0];
+                          /* GET SKU BUNDLE ZORTOUT LIST END */
+                        }
                         return {
                           sku: item.sku,
-                          name: productBySku.name,
+                          name: skuBundleResponse
+                            ? skuBundleResponse.name
+                            : productBySku.name,
                           number: parseFloat(item.qty.toString()),
-                          pricepernumber: parseFloat(productBySku.sellprice),
+                          pricepernumber: skuBundleResponse
+                            ? parseFloat(skuBundleResponse.sellprice)
+                            : parseFloat(productBySku.sellprice),
                           discount: "0",
                           totalprice: parseFloat(item.total.toString()),
                         };
